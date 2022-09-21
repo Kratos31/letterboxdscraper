@@ -25,6 +25,8 @@ def letterboxd(url):
     writers = [writers.text for writers in writers.find_all('a')]
     year = soup.find('small', {'class': 'number'}).text
     description = soup.find('meta', {'property': 'og:description'}).get('content')
+    r = requests.get(url)
+    
     
     
 
@@ -37,6 +39,14 @@ def letterboxd(url):
     item['producer(s)'] = producers
     item['writer(s)'] = writers
     item['description'] = description
+
+    #poster function
+
+    script_w_data = soup.select_one('script[type="application/ld+json"]')
+    json_obj = json.loads(script_w_data.text.split(' */')[1].split('/* ]]>')[0])
+    item['poster'] = json_obj
+    
+
     
 
     movie = url.split('/')[-2]
@@ -56,6 +66,14 @@ def letterboxd(url):
     with open(f'{movie}.json', 'w') as f:
         json.dump(item, f,  indent=2)
     print(item)
+
+def poster(url):
+    r = requests.get(url)
+    soup = bs(r.text)
+
+    script_w_data = soup.select_one('script[type="application/ld+json"]')
+    json_obj = json.loads(script_w_data.text.split(' */')[1].split('/* ]]>')[0])
+    print(json_obj['image'])
 
 movie=input("Enter movie name:")
 movie_url= "https://letterboxd.com/film/" + movie.replace(" ",'-')
