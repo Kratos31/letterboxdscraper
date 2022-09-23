@@ -40,11 +40,7 @@ def letterboxd(url):
     item['writer(s)'] = writers
     item['description'] = description
 
-    #poster function
-
-    script_w_data = soup.select_one('script[type="application/ld+json"]')
-    json_obj = json.loads(script_w_data.text.split(' */')[1].split('/* ]]>')[0])
-    item['poster'] = json_obj
+    
     
 
     
@@ -65,7 +61,20 @@ def letterboxd(url):
     item['liked by'] = liked_by
     with open(f'{movie}.json', 'w') as f:
         json.dump(item, f,  indent=2)
-    print(item)
+    ikk=json.dumps(item)
+    return ikk
+
+def poster(movie_url):
+    r = requests.get(movie_url)
+    soup = BeautifulSoup(r.text, 'lxml')
+    script_w_data = soup.select_one('script[type="application/ld+json"]')
+    json_obj = json.loads(script_w_data.text.split(' */')[1].split('/* ]]>')[0])
+    print(json_obj['image'])
+
+
+
 movie=input("Enter movie name:")
 movie_url= "https://letterboxd.com/film/" + movie.replace(" ",'-')
-letterboxd(movie_url)
+lower_case=movie_url.lower()
+data=letterboxd(lower_case),poster(lower_case)
+
